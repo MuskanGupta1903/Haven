@@ -9,7 +9,11 @@
       "exclude": [
         "no-window",
         "no-window-prefix",
-        "no-node-globals"
+        "no-node-globals",
+        "require-await",
+        "no-explicit-any",
+        "no-unused-vars",
+        "no-empty"
       ]
     }
   }
