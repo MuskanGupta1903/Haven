@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, Download, QrCode as QrIcon } from 'lucide-react';
+import { X, Copy, Check, QrCode as QrIcon } from 'lucide-react';
 
 interface QRCodeModalProps {
   data: object | string;
@@ -22,37 +22,37 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({ data, title = "SOS Eme
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative border border-gray-100 animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-slate-900/95 backdrop-blur-xl border border-ocean-700/50 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-red-50 text-red-600 rounded-full mb-3">
+          <div className="inline-flex items-center justify-center p-3 bg-ocean-500/20 text-ocean-400 rounded-full mb-3 border border-ocean-500/30">
             <QrIcon className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-          <p className="text-xs text-gray-500 mt-1 mb-4">
+          <h3 className="text-lg font-bold text-white">{title}</h3>
+          <p className="text-xs text-slate-400 mt-1 mb-5">
             Show this QR code to responders or volunteers to transfer request offline.
           </p>
 
           {/* QR Code Container */}
-          <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl inline-block mb-4">
+          <div className="bg-white/10 border border-ocean-500/40 p-4 rounded-2xl inline-block mb-5">
             {/* Direct offline SVG rendering fallback + img */}
             <img
               src={qrApiUrl}
               alt="SOS QR Code"
-              className="w-56 h-56 mx-auto rounded-lg object-contain bg-white p-2"
+              className="w-56 h-56 mx-auto rounded-xl object-contain bg-white p-2"
               onError={(e) => {
                 // If offline and image API fails, render plain text fallback
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
-            <div className="text-[10px] font-mono text-gray-400 mt-2 break-all max-h-16 overflow-y-auto bg-white p-2 rounded border">
+            <div className="text-[10px] font-mono text-slate-500 mt-2 break-all max-h-16 overflow-y-auto bg-slate-950 p-2 rounded-lg border border-white/5">
               {jsonString}
             </div>
           </div>
@@ -60,14 +60,14 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({ data, title = "SOS Eme
           <div className="flex gap-2">
             <button
               onClick={handleCopyText}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-slate-200 hover:text-white rounded-xl text-sm font-semibold transition-all"
             >
-              {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-              {copied ? 'Copied' : 'Copy Payload'}
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copied!' : 'Copy Payload'}
             </button>
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md transition"
+              className="flex-1 px-4 py-2.5 bg-coral-600 hover:bg-coral-500 text-white rounded-xl text-sm font-semibold shadow-lg transition-all"
             >
               Close
             </button>

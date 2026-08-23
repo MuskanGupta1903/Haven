@@ -1,0 +1,20 @@
+{
+  "lint": {
+    "exclude": [
+      "dev-dist/",
+      "dist/",
+      "node_modules/"
+    ],
+    "rules": {
+      "exclude": [
+        "no-window",
+        "no-window-prefix",
+        "no-node-globals",
+        "require-await",
+        "no-explicit-any",
+        "no-unused-vars",
+        "no-empty"
+      ]
+    }
+  }
+}

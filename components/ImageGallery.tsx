@@ -49,10 +49,10 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
           <img
             src={images[0]}
             alt="Thumbnail"
-            className="w-12 h-12 object-cover rounded border border-gray-200 hover:border-primary-400 transition-colors"
+            className="w-12 h-12 object-cover rounded-xl border border-white/10 hover:border-ocean-400 transition-colors"
           />
           {images.length > 1 && (
-            <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+            <span className="absolute -top-1 -right-1 bg-ocean-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
               {images.length}
             </span>
           )}
@@ -70,7 +70,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
           <button
             key={index}
             onClick={() => openLightbox(index)}
-            className="relative group overflow-hidden rounded-lg border-2 border-gray-200 hover:border-primary-400 transition-all"
+            className="relative group overflow-hidden rounded-2xl border border-white/10 hover:border-ocean-400 transition-all"
           >
             <img
               src={image}
@@ -98,14 +98,14 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
           {/* Close Button */}
           <button
             onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/50 rounded-full p-2 transition-all hover:bg-black/70 z-10"
+            className="absolute top-4 right-4 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-2 transition-all z-10"
             aria-label="Close"
           >
             <X className="w-6 h-6" />
           </button>
 
           {/* Counter */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm font-medium">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/70 backdrop-blur-sm border border-white/10 text-white px-4 py-1.5 rounded-full text-sm font-medium">
             {currentImageIndex + 1} / {images.length}
           </div>
 
@@ -116,7 +116,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
                 e.stopPropagation();
                 goToPrev();
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/50 rounded-full p-3 transition-all hover:bg-black/70 hover:scale-110"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-3 transition-all hover:scale-110"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-8 h-8" />
@@ -131,7 +131,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
             <img
               src={images[currentImageIndex]}
               alt={`Image ${currentImageIndex + 1}`}
-              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl"
             />
           </div>
 
@@ -142,7 +142,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
                 e.stopPropagation();
                 goToNext();
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/50 rounded-full p-3 transition-all hover:bg-black/70 hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full p-3 transition-all hover:scale-110"
               aria-label="Next image"
             >
               <ChevronRight className="w-8 h-8" />
@@ -151,7 +151,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
 
           {/* Thumbnail Navigation */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/50 p-2 rounded-lg max-w-[90vw] overflow-x-auto">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-slate-900/70 backdrop-blur-sm border border-white/10 p-2 rounded-xl max-w-[90vw] overflow-x-auto">
               {images.map((image, index) => (
                 <button
                   key={index}
@@ -159,9 +159,9 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`flex-shrink-0 rounded overflow-hidden transition-all ${
+                  className={`flex-shrink-0 rounded-xl overflow-hidden transition-all ${
                     index === currentImageIndex
-                      ? 'ring-2 ring-primary-500 scale-110'
+                      ? 'ring-2 ring-ocean-500 scale-110'
                       : 'opacity-60 hover:opacity-100'
                   }`}
                 >
@@ -176,8 +176,8 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, compact = fa
           )}
 
           {/* Keyboard Hints */}
-          <div className="absolute bottom-4 right-4 bg-black/50 text-white/60 px-3 py-1 rounded text-xs">
-            Use ← → arrow keys or ESC to close
+          <div className="absolute bottom-4 right-4 bg-slate-900/60 text-white/50 border border-white/10 px-3 py-1 rounded-lg text-xs">
+            ← → arrow keys · ESC to close
           </div>
         </div>
       )}
