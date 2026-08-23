@@ -6,7 +6,6 @@ import { IncidentDashboard } from './pages/IncidentDashboard';
 import { PublicSubmit } from './pages/PublicSubmit';
 import { DesignNotes } from './pages/DesignNotes';
 import { NetworkStatus } from './components/pwa/NetworkStatus';
-import { PWAInstallPrompt } from './components/pwa/PWAInstallPrompt';
 import { ThemeToggle } from './components/ThemeToggle';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 
@@ -21,7 +20,6 @@ const App: React.FC = () => {
 
       {/* PWA Components - Global */}
       <NetworkStatus />
-      <PWAInstallPrompt />
 
       <Routes>
         <Route path="/" element={<Home />} />
