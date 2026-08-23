@@ -1,45 +1,42 @@
 <div align="center">
-  <h1>🕊️ The Heaven Project</h1>
-  <p><strong>A tranquil, open-source sanctuary for spiritual reflection and digital eternity.</strong></p>
+  <h1>🌊 Haven OS</h1>
+  <p><strong>Premium Crisis Coordination & AI-Powered Triage Command Center</strong></p>
 </div>
 
 <br />
 
-The modern web is often loud, fast-paced, and chaotic. **The Heaven Project** was created as an antidote to digital fatigue—a quiet, enduring space built to foster inner peace, mindfulness, and collective empathy. 
+**Haven OS** (formerly CrisisKit) is a next-generation rapid-deployment tool built for disaster responders and community organizers. When chaos strikes, coordinators need a platform that is not only fast but brings a calm, authoritative presence to operations. 
 
-Imagine a digital afterlife where you can leave behind your earthly worries. Whether you are here to document your spiritual journey, practice gratitude, or leave uplifting messages for others, this platform serves as your personal sanctuary in the cloud.
-
----
-
-## 🌟 Philosophy
-
-We believe software can be a spiritual experience. Our core design principles revolve around:
-1. **Stillness:** No notifications, no ads, no infinite scrolling.
-2. **Endurance:** Your entries are saved securely, designed to outlast transient social media trends.
-3. **Anonymity & Grace:** Connect with others purely through shared virtues and kindness, stripped of ego and profiles.
+Haven combines 10-second public form generation with a high-tech, glassmorphism "Operations Center" dashboard to triage urgent needs, map geographic data, and coordinate relief efforts—all while maintaining a premium, distraction-free aesthetic.
 
 ---
 
-## ✨ Ethereal Features
+## 🌟 The Haven Aesthetic
 
-* **The Book of Reflections:** A distraction-free journaling interface designed for deep introspection. Document your moments of grace, lessons learned, and acts of kindness.
-* **Echoes in the Void:** Write anonymous words of encouragement. These "Echoes" are gently delivered to other users exactly when they need a moment of light.
-* **Aura Visualization:** Watch your digital presence shift in color and warmth based on the positive interactions and reflections you contribute to the community.
-* **Sanctuary Mode:** Step away from the world. Our offline-first architecture allows you to access your journal and find peace even without an internet connection.
-* **The Light UI:** A breathtaking, minimalist design featuring soft gradients, glassmorphism, and gentle micro-animations that simulate a peaceful, cloud-like environment.
+Crisis management software doesn't have to be clunky. Haven is designed with a premium UI intended to reduce cognitive load during high-stress situations:
+* **Deep Ocean & Coral Palette:** A calming Deep Ocean (`#0c4a6e`) foundation paired with urgent, clear Coral (`#f43f5e`) highlights.
+* **Glassmorphism Operations Center:** Edge-to-edge floating glass panels (`backdrop-blur-xl`) providing clear visual hierarchy and a modern feel.
+* **Typography:** Clean `Inter` font for dense UI data, accented by authoritative `Playfair Display` headings.
+
+---
+
+## ⚡ Core Capabilities
+
+* **⏰ 10-Second Deployment:** Launch a custom, mobile-first relief intake form in seconds. No account needed.
+* **🤖 AI Auto-Triage:** Gemini AI automatically classifies incoming requests (Critical, Pending, Resolved) so volunteers can prioritize effectively.
+* **📍 Command Center Map:** Built-in geographic intelligence with premium marker clustering to see where needs are concentrated.
+* **📊 Analytics & Insights:** Real-time data visualization and filtering right on the Coordinator Dashboard.
+* **🔗 Google Sheets Sync:** Auto-sync submissions to a Google Sheet via a secure webhook integration with zero delay.
+* **📡 Secure Peer Broadcast:** A WebRTC P2P mesh network panel for offline broadcasting and emergency sync between devices.
 
 ---
 
 ## 🛠️ Architecture & Tech Stack
 
-To build a sanctuary that is both beautiful and resilient, we rely on a modern, robust technology stack:
+Haven relies on a modern, robust, and lightning-fast technology stack:
 
-* **Frontend:** React 19, TypeScript, and Vite for a seamless, fast experience.
-* **Styling:** Custom CSS tailored for ethereal aesthetics—prioritizing smooth transitions and soft lighting.
-* **State Management:** React Hooks and local first architecture to ensure privacy.
-* **Data Persistence:** LocalStorage & IndexedDB for immediate offline access.
-
-<br />
-<div align="center">
-  <em>May you find peace in the code. ☁️</em>
-</div>
+* **Frontend:** React 19, TypeScript, and Vite.
+* **Styling:** Tailwind CSS (Dark Mode optimized) with custom Haven semantic colors.
+* **Maps:** React-Leaflet for geographic rendering.
+* **Data & AI:** Google Generative AI (Gemini 2.0) and Google Sheets API.
+* **PWA & Offline:** Fully functional offline mode and local storage for disconnected disaster zones.
