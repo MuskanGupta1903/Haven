@@ -1,4 +1,3 @@
-import process from "node:process";
 import { IncidentsRepo } from '../types';
 import { InMemoryRepo } from './InMemoryRepo';
 
@@ -35,6 +34,8 @@ export function createIncidentsRepo(): IncidentsRepo {
 
   // Option 2: Check for Google Sheets configuration (server-side only)
   const hasGoogleSheetsEnv =
+    typeof process !== 'undefined' &&
+    process.env &&
     process.env.GOOGLE_SHEETS_SPREADSHEET_ID &&
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
