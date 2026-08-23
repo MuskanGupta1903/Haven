@@ -145,7 +145,7 @@ export const Home: React.FC = () => {
             </p>
             <div className="flex justify-center">
                 <Link to="/create">
-                    <Button size="lg" className="px-12 py-4 text-sm bg-white dark:bg-slate-100 text-slate-900 border-none shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.25)] rounded-full uppercase tracking-[0.2em] font-bold z-10 relative">
+                    <Button size="lg" className="px-10 py-4 text-sm bg-ocean-600 hover:bg-ocean-700 dark:bg-ocean-500 dark:hover:bg-ocean-600 text-white border-none shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.25)] rounded-full uppercase tracking-[0.2em] font-bold z-10 relative transition-all">
                         Get Started
                     </Button>
                 </Link>

@@ -10,17 +10,17 @@ export const Input: React.FC<InputProps> = ({ label, error, className = '', id, 
   
   return (
     <div className="w-full">
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={inputId} className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">
         {label}
       </label>
       <input
         id={inputId}
-        className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-          error ? 'border-danger-500' : 'border-gray-300'
+        className={`w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border rounded-xl shadow-sm placeholder-slate-400 dark:placeholder-slate-500 text-ocean-900 dark:text-ocean-100 font-bold focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all ${
+          error ? 'border-coral-500' : 'border-slate-300 dark:border-slate-600'
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-danger-600">{error}</p>}
+      {error && <p className="mt-2 text-xs font-medium text-coral-600 dark:text-coral-400">{error}</p>}
     </div>
   );
 };
@@ -35,17 +35,17 @@ export const TextArea: React.FC<TextAreaProps> = ({ label, error, className = ''
   
   return (
     <div className="w-full">
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={inputId} className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">
         {label}
       </label>
       <textarea
         id={inputId}
-        className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-          error ? 'border-danger-500' : 'border-gray-300'
+        className={`w-full px-4 py-3 bg-white/80 dark:bg-slate-900/80 border rounded-xl shadow-sm placeholder-slate-400 dark:placeholder-slate-500 text-ocean-900 dark:text-ocean-100 font-bold focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all ${
+          error ? 'border-coral-500' : 'border-slate-300 dark:border-slate-600'
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-danger-600">{error}</p>}
+      {error && <p className="mt-2 text-xs font-medium text-coral-600 dark:text-coral-400">{error}</p>}
     </div>
   );
 };
