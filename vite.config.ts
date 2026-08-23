@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', 'VITE_');
     return {
+      base: '/Haven/',
       plugins: [
         react(),
         VitePWA({
@@ -19,8 +20,8 @@ export default defineConfig(({ mode }) => {
             background_color: '#ffffff',
             display: 'standalone',
             orientation: 'portrait',
-            start_url: '/',
-            scope: '/',
+            start_url: '/Haven/',
+            scope: '/Haven/',
             icons: [
               {
                 src: 'icon.svg',
@@ -34,7 +35,7 @@ export default defineConfig(({ mode }) => {
                 name: 'Emergency Submit',
                 short_name: 'SOS',
                 description: 'Quick emergency submission',
-                url: '/#/submit',
+                url: '/Haven/#/submit',
                 icons: [{ src: 'icon.svg', sizes: '192x192' }]
               }
             ]
