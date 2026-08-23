@@ -1,8 +1,10 @@
+import process from "node:process";
 import { IncidentsRepo } from '../types';
 import { InMemoryRepo } from './InMemoryRepo';
 
-// Declare require to avoid TypeScript errors when @types/node is not available
-declare const require: any;
+// Typed require shim for optional CommonJS interop (Supabase / GoogleSheets lazy-loads)
+// deno-lint-ignore no-explicit-any
+declare const require: (id: string) => any;
 
 /**
  * Repository Factory - Automatically selects the best storage backend
@@ -33,8 +35,6 @@ export function createIncidentsRepo(): IncidentsRepo {
 
   // Option 2: Check for Google Sheets configuration (server-side only)
   const hasGoogleSheetsEnv =
-    typeof process !== 'undefined' &&
-    process.env &&
     process.env.GOOGLE_SHEETS_SPREADSHEET_ID &&
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;

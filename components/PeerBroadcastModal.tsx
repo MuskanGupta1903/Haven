@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Incident } from '../types';
 import { P2PSyncManager } from '../utils/p2pSync';
-import { Radio, Shield, Wifi } from 'lucide-react';
+import { Radio } from 'lucide-react';
 
 interface PeerBroadcastModalProps {
   isOpen: boolean;

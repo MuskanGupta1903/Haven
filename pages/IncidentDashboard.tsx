@@ -127,7 +127,7 @@ export const IncidentDashboard: React.FC = () => {
         await loadData();
         alert(`Successfully imported ${data.responses.length} responses!`);
       }
-    } catch (err) {
+    } catch (_err) {
       alert('Failed to import JSON file. Format may be invalid.');
     }
   };
@@ -192,7 +192,7 @@ export const IncidentDashboard: React.FC = () => {
             setResponderCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
             setSortByDistance(true);
           },
-          (err) => alert('Could not fetch responder location for proximity sorting.')
+          (_err) => alert('Could not fetch responder location for proximity sorting.')
         );
       }
     } else {
