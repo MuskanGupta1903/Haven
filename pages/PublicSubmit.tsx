@@ -168,7 +168,7 @@ export const PublicSubmit: React.FC = () => {
         setSubmitted(true);
         setDuplicateWarning(null);
         window.scrollTo(0, 0);
-      } catch (error) {
+      } catch (_error) {
         alert('Failed to save offline. Please try again.');
       } finally {
         setIsSubmitting(false);
@@ -189,7 +189,9 @@ export const PublicSubmit: React.FC = () => {
         setDuplicateWarning(`You submitted a request at ${lastSubmission}. Click submit again to update your information.`);
         return;
       }
-    } catch (error) {}
+    } catch (_error) {
+      // Silently ignore duplicate check errors
+    }
 
     // Online: Submit directly
     setIsSubmitting(true);
@@ -199,13 +201,13 @@ export const PublicSubmit: React.FC = () => {
       setSubmitted(true);
       setDuplicateWarning(null);
       window.scrollTo(0, 0);
-    } catch (error) {
+    } catch (_error) {
       try {
         await offlineQueue.add(submissionData);
         setSubmittedPayload(submissionData);
         setSavedOffline(true);
         setSubmitted(true);
-      } catch (offlineError) {
+      } catch (_offlineError) {
         alert('Failed to submit. Please try again.');
       }
     } finally {
