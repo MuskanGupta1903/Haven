@@ -131,7 +131,7 @@ export const PWAInstallPrompt: React.FC = () => {
           </div>
 
           <div className="flex-1">
-            <h3 className="font-bold text-lg mb-1">Install CrisisKit</h3>
+            <h3 className="font-bold text-lg mb-1">Install Haven</h3>
             <p className="text-sm text-white/90 mb-4">
               Install this app for faster access and offline capability during emergencies.
             </p>

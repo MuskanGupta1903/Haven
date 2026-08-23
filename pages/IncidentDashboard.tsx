@@ -10,7 +10,7 @@ import { RelativeTime } from '../components/RelativeTime';
 import { exportToCSV } from '../utils/csvExport';
 import { exportToGoogleSheets } from '../utils/googleSheetsExport';
 import { ResponseStatus } from '../types';
-import { ArrowLeft, Share2, RefreshCw, AlertCircle, FileText, ExternalLink, Download, Sheet, Settings, BarChart3, Map, List, CheckSquare, Square, FileJson, Upload, QrCode } from 'lucide-react';
+import { ArrowLeft, Share2, RefreshCw, AlertCircle, FileText, ExternalLink, Download, Sheet, Settings, BarChart3, Map, List, FileJson, Upload, QrCode, Radio, Navigation, Loader2 } from 'lucide-react';
 import { GoogleSheetsSetup } from '../components/GoogleSheetsSetup';
 import { StatisticsChart } from '../components/StatisticsChart';
 import { MapView } from '../components/MapView';
@@ -18,10 +18,8 @@ import { ImageGallery } from '../components/ImageGallery';
 import { EmergencyAudioAlert } from '../components/EmergencyAudioAlert';
 import { QRScannerModal } from '../components/QRScannerModal';
 import { PeerBroadcastModal } from '../components/PeerBroadcastModal';
-import { Radio } from 'lucide-react';
 
 import { calculateDistanceKm, parseLocationCoords } from '../utils/geoDistance';
-import { Navigation } from 'lucide-react';
 
 export const IncidentDashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,7 +109,7 @@ export const IncidentDashboard: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `crisiskit_${incident.title.replace(/\s+/g, '_')}_backup.json`;
+    a.download = `haven_${incident.title.replace(/\s+/g, '_')}_backup.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -175,7 +173,7 @@ export const IncidentDashboard: React.FC = () => {
             href={part} 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-primary-600 hover:text-primary-800 hover:underline inline-flex items-center"
+            className="text-ocean-400 hover:text-ocean-300 hover:underline inline-flex items-center"
             onClick={(e) => e.stopPropagation()}
           >
             Maps Link <ExternalLink className="w-3 h-3 ml-1" />
@@ -202,8 +200,30 @@ export const IncidentDashboard: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-gray-500">Loading incident data...</div>;
-  if (!incident) return <div className="p-12 text-center text-danger-500">Incident not found.</div>;
+  // ── Loading & Error States ──────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-ocean-950 to-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-ocean-400 animate-spin" />
+          <p className="text-slate-400 text-sm font-medium">Loading incident data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!incident) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-ocean-950 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-coral-400 text-lg font-semibold">Incident not found.</p>
+          <Link to="/" className="mt-4 inline-block text-ocean-400 hover:text-ocean-300 text-sm underline">
+            Return to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Get unique regions and districts for filtering
   const uniqueRegions = [...new Set(responses.map(r => r.region).filter(Boolean))];
@@ -229,388 +249,442 @@ export const IncidentDashboard: React.FC = () => {
     });
   }
 
+  // ── Shared style tokens ─────────────────────────────────────────────────
+  const glassCard = 'bg-white/5 dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl';
+  const selectClass =
+    'px-3 py-2 bg-slate-800/80 border border-ocean-800/60 text-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all';
+
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-           <Link to="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-2">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-ocean-950 to-slate-900">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+        {/* ── Header ────────────────────────────────────────────────────── */}
+        <div className="mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center text-slate-400 hover:text-ocean-300 mb-4 transition-colors text-sm group"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
             Back to All Incidents
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">{incident.title}</h1>
-          <p className="text-gray-500 mt-1">
-            {responses.length} responses collected • Created {new Date(incident.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2.5 items-center">
-          <EmergencyAudioAlert responses={responses} />
-          <Button
-            onClick={handleToggleProximitySort}
-            variant={sortByDistance ? "primary" : "secondary"}
-            title="Sort responses by distance to responder GPS"
-          >
-            <Navigation className="mr-2 h-4 w-4 text-blue-500" />
-            {sortByDistance ? 'Nearest First' : 'Proximity Sort'}
-          </Button>
-          <Button
-            onClick={() => setViewMode(viewMode === 'table' ? 'map' : 'table')}
-            variant={viewMode === 'map' ? "primary" : "secondary"}
-            disabled={responses.length === 0}
-          >
-            {viewMode === 'table' ? (
-              <>
-                <Map className="mr-2 h-4 w-4" />
-                Map View
-              </>
-            ) : (
-              <>
-                <List className="mr-2 h-4 w-4" />
-                List View
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={() => setShowStatistics(!showStatistics)}
-            variant={showStatistics ? "primary" : "secondary"}
-            disabled={responses.length === 0}
-          >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            {showStatistics ? 'Hide Stats' : 'Show Stats'}
-          </Button>
-          <Button onClick={runAIAnalysis} variant="secondary" disabled={isAnalyzing || responses.length === 0}>
-             <RefreshCw className={`mr-2 h-4 w-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
-             {isAnalyzing ? 'Analyzing...' : 'Run AI Triage'}
-          </Button>
-          <Button onClick={() => setShowSheetsSetup(true)} variant="secondary">
-            <Settings className="mr-2 h-4 w-4" />
-            Auto-Sync Setup
-          </Button>
-          <Button onClick={handleExportToSheets} variant="secondary" disabled={responses.length === 0}>
-            <Sheet className="mr-2 h-4 w-4" />
-            Open in Sheets
-          </Button>
-          <Button onClick={handleExportCSV} variant="secondary" disabled={responses.length === 0}>
-            <Download className="mr-2 h-4 w-4" />
-            CSV
-          </Button>
-          <Button onClick={handleExportJSON} variant="secondary" disabled={responses.length === 0} title="Backup Incident Data">
-            <FileJson className="mr-2 h-4 w-4" />
-            Backup JSON
-          </Button>
-          <label className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-            <Upload className="mr-2 h-4 w-4" />
-            Restore JSON
-            <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
-          </label>
-          <Button onClick={() => setShowQRScanner(true)} variant="primary">
-            <QrCode className="mr-2 h-4 w-4" />
-            Scan Victim QR
-          </Button>
-          <Button onClick={() => setShowPeerSync(true)} variant="secondary" title="Offline WebRTC P2P Emergency Mesh Broadcast">
-            <Radio className="mr-2 h-4 w-4 text-amber-500" />
-            P2P Mesh Broadcast
-          </Button>
-          <Button onClick={copyPublicLink}>
-            <Share2 className="mr-2 h-4 w-4" />
-            Copy Public Link
-          </Button>
-        </div>
-      </div>
 
-      {/* Batch Action Toolbar */}
-      {selectedIds.length > 0 && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
-          <span className="text-sm font-medium text-blue-900">
-            {selectedIds.length} item(s) selected
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleBatchUpdateStatus('in_progress')}
-              className="px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700"
-            >
-              Mark In Progress
-            </button>
-            <button
-              onClick={() => handleBatchUpdateStatus('resolved')}
-              className="px-3 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700"
-            >
-              Mark Resolved
-            </button>
-            <button
-              onClick={() => setSelectedIds([])}
-              className="px-3 py-1 text-gray-600 text-xs hover:underline"
-            >
-              Deselect All
-            </button>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+            <div>
+              {/* Brand badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ocean-900/60 border border-ocean-700/50 text-ocean-300 text-xs font-semibold tracking-widest uppercase mb-3">
+                <span className="w-1.5 h-1.5 bg-ocean-400 rounded-full animate-pulse" />
+                HAVEN Command
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-white leading-tight">
+                {incident.title}
+              </h1>
+              <p className="text-slate-400 mt-2 text-sm">
+                <span className="text-ocean-400 font-semibold">{responses.length}</span> responses collected
+                <span className="text-slate-600 mx-2">·</span>
+                Created {new Date(incident.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+
+            {/* ── Action Toolbar ─────────────────────────────────────── */}
+            <div className="flex flex-wrap gap-2 items-center">
+              <EmergencyAudioAlert responses={responses} />
+
+              {/* View Mode Segment Control */}
+              <div className="flex items-center bg-slate-800/80 border border-white/10 rounded-xl p-1 gap-1">
+                <button
+                  onClick={() => setViewMode('table')}
+                  disabled={responses.length === 0}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    viewMode === 'table'
+                      ? 'bg-ocean-600 text-white shadow-lg'
+                      : 'text-slate-400 hover:text-slate-200 disabled:opacity-40'
+                  }`}
+                >
+                  <List className="h-3.5 w-3.5" />
+                  List
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  disabled={responses.length === 0}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    viewMode === 'map'
+                      ? 'bg-ocean-600 text-white shadow-lg'
+                      : 'text-slate-400 hover:text-slate-200 disabled:opacity-40'
+                  }`}
+                >
+                  <Map className="h-3.5 w-3.5" />
+                  Map
+                </button>
+              </div>
+
+              <Button
+                onClick={() => setShowStatistics(!showStatistics)}
+                variant={showStatistics ? 'primary' : 'secondary'}
+                disabled={responses.length === 0}
+              >
+                <BarChart3 className="mr-1.5 h-4 w-4" />
+                {showStatistics ? 'Hide Analytics' : 'Analytics'}
+              </Button>
+
+              <Button
+                onClick={handleToggleProximitySort}
+                variant={sortByDistance ? 'primary' : 'secondary'}
+                title="Sort responses by distance to responder GPS"
+              >
+                <Navigation className="mr-1.5 h-4 w-4" />
+                {sortByDistance ? 'Nearest First' : 'Proximity'}
+              </Button>
+
+              <Button onClick={runAIAnalysis} variant="secondary" disabled={isAnalyzing || responses.length === 0}>
+                <RefreshCw className={`mr-1.5 h-4 w-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                {isAnalyzing ? 'Analyzing...' : 'AI Triage'}
+              </Button>
+
+              <Button onClick={() => setShowQRScanner(true)} variant="primary">
+                <QrCode className="mr-1.5 h-4 w-4" />
+                Scan QR
+              </Button>
+
+              <Button onClick={() => setShowPeerSync(true)} variant="secondary" title="Offline WebRTC P2P Emergency Mesh Broadcast">
+                <Radio className="mr-1.5 h-4 w-4 text-ocean-300" />
+                P2P Mesh
+              </Button>
+
+              <Button onClick={copyPublicLink}>
+                <Share2 className="mr-1.5 h-4 w-4" />
+                Share Link
+              </Button>
+
+              {/* Export group */}
+              <div className="flex items-center gap-1.5">
+                <Button onClick={() => setShowSheetsSetup(true)} variant="secondary">
+                  <Settings className="mr-1.5 h-4 w-4" />
+                  Sync Setup
+                </Button>
+                <Button onClick={handleExportToSheets} variant="secondary" disabled={responses.length === 0}>
+                  <Sheet className="mr-1.5 h-4 w-4" />
+                  Sheets
+                </Button>
+                <Button onClick={handleExportCSV} variant="secondary" disabled={responses.length === 0}>
+                  <Download className="mr-1.5 h-4 w-4" />
+                  CSV
+                </Button>
+                <Button onClick={handleExportJSON} variant="secondary" disabled={responses.length === 0} title="Backup Incident Data">
+                  <FileJson className="mr-1.5 h-4 w-4" />
+                  JSON
+                </Button>
+                <label className="inline-flex items-center px-3 py-2 border border-white/10 rounded-xl text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 cursor-pointer transition-all">
+                  <Upload className="mr-1.5 h-4 w-4" />
+                  Restore
+                  <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Statistics Dashboard */}
-      {showStatistics && responses.length > 0 && (
-        <div className="mb-6">
-          <StatisticsChart responses={responses} />
-        </div>
-      )}
+        {/* ── Batch Action Toolbar ──────────────────────────────────────── */}
+        {selectedIds.length > 0 && (
+          <div className={`mb-4 p-3 ${glassCard} border-ocean-700/50 flex items-center justify-between`}>
+            <span className="text-sm font-semibold text-ocean-300">
+              {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleBatchUpdateStatus('in_progress')}
+                className="px-3 py-1.5 bg-ocean-600 hover:bg-ocean-500 text-white rounded-lg text-xs font-semibold transition-all"
+              >
+                Mark In Progress
+              </button>
+              <button
+                onClick={() => handleBatchUpdateStatus('resolved')}
+                className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold transition-all"
+              >
+                Mark Resolved
+              </button>
+              <button
+                onClick={() => setSelectedIds([])}
+                className="px-3 py-1.5 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors"
+              >
+                Deselect All
+              </button>
+            </div>
+          </div>
+        )}
 
-      {/* Region/District Filters */}
-      {uniqueRegions.length > 0 && (
-        <div className="mb-6 flex flex-wrap gap-3 items-center">
-          <span className="text-sm font-medium text-gray-700">Filter by:</span>
-          <select
-            value={regionFilter}
-            onChange={(e) => {
-              setRegionFilter(e.target.value);
-              setDistrictFilter('');
-            }}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">All Regions ({responses.length})</option>
-            {uniqueRegions.map(region => (
-              <option key={region} value={region}>
-                {region} ({responses.filter(r => r.region === region).length})
-              </option>
-            ))}
-          </select>
+        {/* ── Statistics Panel ──────────────────────────────────────────── */}
+        {showStatistics && responses.length > 0 && (
+          <div className="mb-6">
+            <StatisticsChart responses={responses} />
+          </div>
+        )}
 
-          {regionFilter && uniqueDistricts.length > 0 && (
+        {/* ── Region/District Filters ───────────────────────────────────── */}
+        {uniqueRegions.length > 0 && (
+          <div className="mb-5 flex flex-wrap gap-3 items-center">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Filter:</span>
             <select
-              value={districtFilter}
-              onChange={(e) => setDistrictFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+              value={regionFilter}
+              onChange={(e) => {
+                setRegionFilter(e.target.value);
+                setDistrictFilter('');
+              }}
+              className={selectClass}
             >
-              <option value="">All Districts ({filteredByRegion.length})</option>
-              {uniqueDistricts.map(district => (
-                <option key={district} value={district}>
-                  {district} ({filteredByRegion.filter(r => r.district === district).length})
+              <option value="">All Regions ({responses.length})</option>
+              {uniqueRegions.map(region => (
+                <option key={region} value={region}>
+                  {region} ({responses.filter(r => r.region === region).length})
                 </option>
               ))}
             </select>
-          )}
 
-          {(regionFilter || districtFilter) && (
-            <button
-              onClick={() => {
-                setRegionFilter('');
-                setDistrictFilter('');
-              }}
-              className="text-sm text-primary-600 hover:text-primary-800 font-medium"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      )}
+            {regionFilter && uniqueDistricts.length > 0 && (
+              <select
+                value={districtFilter}
+                onChange={(e) => setDistrictFilter(e.target.value)}
+                className={selectClass}
+              >
+                <option value="">All Districts ({filteredByRegion.length})</option>
+                {uniqueDistricts.map(district => (
+                  <option key={district} value={district}>
+                    {district} ({filteredByRegion.filter(r => r.district === district).length})
+                  </option>
+                ))}
+              </select>
+            )}
 
-      {/* Map View */}
-      {viewMode === 'map' && (
-        <div className="mb-6">
-          <MapView responses={filteredResponses} />
-        </div>
-      )}
-
-      {/* Table View */}
-      {viewMode === 'table' && (
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-          {filteredResponses.length === 0 ? (
-          responses.length === 0 ? (
-            <div className="p-12 text-center">
-              <FileText className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900">No responses yet</h3>
-              <p className="text-gray-500 mt-1 mb-6">Share the public link to start collecting needs.</p>
-              <Button onClick={copyPublicLink} variant="secondary">Copy Link</Button>
-            </div>
-          ) : (
-            <div className="p-12 text-center">
-              <p className="text-gray-500">No responses match the selected filters.</p>
+            {(regionFilter || districtFilter) && (
               <button
                 onClick={() => {
                   setRegionFilter('');
                   setDistrictFilter('');
                 }}
-                className="mt-4 text-sm text-primary-600 hover:text-primary-800 font-medium"
+                className="text-xs text-ocean-400 hover:text-ocean-300 font-semibold transition-colors"
               >
                 Clear filters
               </button>
-            </div>
-          )
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.length > 0 && selectedIds.length === filteredResponses.length}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedIds(filteredResponses.map(r => r.id));
-                        } else {
-                          setSelectedIds([]);
-                        }
-                      }}
-                      className="rounded text-primary-600 focus:ring-primary-500 h-4 w-4"
-                    />
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgency</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name / Contact</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Needs & Location</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredResponses.map((response) => {
-                  const urgency = response.aiClassification?.urgency || 'UNKNOWN';
-                  const isSelected = selectedIds.includes(response.id);
-                  const rowClass = urgency === 'CRITICAL'
-                    ? 'bg-red-50 hover:bg-red-100 border-l-4 border-red-500'
-                    : urgency === 'MODERATE'
-                    ? 'bg-yellow-50 hover:bg-yellow-100 border-l-4 border-yellow-500'
-                    : 'hover:bg-gray-50';
-
-                  return (
-                  <tr key={response.id} className={rowClass}>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedIds(prev => [...prev, response.id]);
-                          } else {
-                            setSelectedIds(prev => prev.filter(id => id !== response.id));
-                          }
-                        }}
-                        className="rounded text-primary-600 focus:ring-primary-500 h-4 w-4"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <StatusBadge status={response.status || 'pending'} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {response.aiClassification ? (
-                        <div className="flex flex-col gap-1">
-                          <UrgencyBadge level={response.aiClassification.urgency} />
-                          <span className="text-xs text-gray-500 max-w-[150px] truncate" title={response.aiClassification.reasoning}>
-                            {response.aiClassification.reasoning}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400 italic flex items-center">
-                          <AlertCircle className="w-3 h-3 mr-1" /> Pending
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{response.name}</div>
-                      <div className="text-sm text-gray-500">{response.contact}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 line-clamp-2">{response.needs}</div>
-                      <div className="text-xs text-gray-500 mt-1 space-y-0.5">
-                        {response.region && (
-                          <div className="font-medium text-gray-700">
-                            📍 {response.region}{response.district && ` • ${response.district}`}
-                          </div>
-                        )}
-                        <div className="break-words">
-                          {renderLocation(response.location)}
-                        </div>
-                        {responderCoords && (() => {
-                          const victimCoords = parseLocationCoords(response.location);
-                          if (victimCoords) {
-                            const dist = calculateDistanceKm(responderCoords.lat, responderCoords.lng, victimCoords.lat, victimCoords.lng);
-                            return (
-                              <div className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded font-semibold text-[11px]">
-                                🧭 {dist} km away
-                              </div>
-                            );
-                          }
-                          return null;
-                        })()}
-                      </div>
-                      {response.images && response.images.length > 0 && (
-                        <div className="mt-2">
-                          <ImageGallery images={response.images} compact />
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <RelativeTime timestamp={response.submittedAt} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex gap-2">
-                        {response.status !== 'in_progress' && response.status !== 'resolved' && (
-                          <button
-                            onClick={() => updateResponseStatus(response.id, 'in_progress')}
-                            className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                          >
-                            Start
-                          </button>
-                        )}
-                        {response.status !== 'resolved' && (
-                          <button
-                            onClick={() => updateResponseStatus(response.id, 'resolved')}
-                            className="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                          >
-                            Resolve
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            )}
           </div>
         )}
-        </div>
-      )}
 
-      {/* Google Sheets Setup Modal */}
-      {showSheetsSetup && id && (
-        <GoogleSheetsSetup incidentId={id} onClose={() => setShowSheetsSetup(false)} />
-      )}
+        {/* ── Map View ──────────────────────────────────────────────────── */}
+        {viewMode === 'map' && (
+          <div className={`mb-6 ${glassCard} overflow-hidden`}>
+            <MapView responses={filteredResponses} />
+          </div>
+        )}
 
-      {/* Offline QR Scanner Modal */}
-      {showQRScanner && id && (
-        <QRScannerModal
-          incidentId={id}
-          onScanSuccess={async (scannedData) => {
-            await storageService.submitResponse({
-              incidentId: id,
-              name: scannedData.name || 'Anonymous',
-              contact: scannedData.contact || 'N/A',
-              needs: scannedData.needs || 'No details provided',
-              location: scannedData.location || 'Unknown',
-              region: scannedData.region,
-              district: scannedData.district,
-              images: scannedData.images || [],
-            });
-            await loadData();
-          }}
-          onClose={() => setShowQRScanner(false)}
-        />
-      )}
+        {/* ── Table View ────────────────────────────────────────────────── */}
+        {viewMode === 'table' && (
+          <div className={`${glassCard} overflow-hidden`}>
+            {filteredResponses.length === 0 ? (
+              responses.length === 0 ? (
+                <div className="p-16 text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800/60 border border-white/10 mb-4">
+                    <FileText className="h-7 w-7 text-slate-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">No responses yet</h3>
+                  <p className="text-slate-400 mt-1 mb-6 text-sm">Share the public link to start collecting needs from citizens.</p>
+                  <Button onClick={copyPublicLink} variant="secondary">
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Copy Public Link
+                  </Button>
+                </div>
+              ) : (
+                <div className="p-12 text-center">
+                  <p className="text-slate-400 text-sm">No responses match the selected filters.</p>
+                  <button
+                    onClick={() => {
+                      setRegionFilter('');
+                      setDistrictFilter('');
+                    }}
+                    className="mt-3 text-sm text-ocean-400 hover:text-ocean-300 font-semibold transition-colors"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th scope="col" className="px-4 py-4 text-left">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.length > 0 && selectedIds.length === filteredResponses.length}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIds(filteredResponses.map(r => r.id));
+                            } else {
+                              setSelectedIds([]);
+                            }
+                          }}
+                          className="rounded border-slate-600 bg-slate-700 text-ocean-500 focus:ring-ocean-500 h-4 w-4"
+                        />
+                      </th>
+                      {['Status', 'Urgency', 'Name / Contact', 'Needs & Location', 'Time', 'Actions'].map(col => (
+                        <th key={col} scope="col" className="px-6 py-4 text-left text-xs font-semibold text-ocean-300 uppercase tracking-widest">
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {filteredResponses.map((response) => {
+                      const urgency = response.aiClassification?.urgency || 'UNKNOWN';
+                      const isSelected = selectedIds.includes(response.id);
 
-      {/* Offline P2P WebRTC Sync Modal */}
-      {showPeerSync && (
-        <PeerBroadcastModal
-          isOpen={showPeerSync}
-          onClose={() => setShowPeerSync(false)}
-          incidents={incident ? [incident] : []}
-          onImportIncidents={async (importedIncidents) => {
-            for (const inc of importedIncidents) {
-              await storageService.saveIncident(inc);
-            }
-            await loadData();
-          }}
-        />
-      )}
+                      const rowBorderClass =
+                        urgency === 'CRITICAL'
+                          ? 'border-l-2 border-coral-500 bg-coral-900/10 hover:bg-coral-900/20'
+                          : urgency === 'MODERATE'
+                          ? 'border-l-2 border-amber-500 bg-amber-900/10 hover:bg-amber-900/20'
+                          : 'hover:bg-white/5';
+
+                      return (
+                        <tr
+                          key={response.id}
+                          className={`transition-colors ${rowBorderClass} ${isSelected ? 'bg-ocean-900/20' : ''}`}
+                        >
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedIds(prev => [...prev, response.id]);
+                                } else {
+                                  setSelectedIds(prev => prev.filter(id => id !== response.id));
+                                }
+                              }}
+                              className="rounded border-slate-600 bg-slate-700 text-ocean-500 focus:ring-ocean-500 h-4 w-4"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <StatusBadge status={response.status || 'pending'} />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {response.aiClassification ? (
+                              <div className="flex flex-col gap-1">
+                                <UrgencyBadge level={response.aiClassification.urgency} />
+                                <span className="text-xs text-slate-500 max-w-[150px] truncate" title={response.aiClassification.reasoning}>
+                                  {response.aiClassification.reasoning}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-slate-500 italic flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" /> Pending AI
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-semibold text-white">{response.name}</div>
+                            <div className="text-xs text-slate-400 mt-0.5">{response.contact}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-slate-200 line-clamp-2">{response.needs}</div>
+                            <div className="text-xs text-slate-500 mt-1.5 space-y-0.5">
+                              {response.region && (
+                                <div className="font-medium text-slate-400">
+                                  📍 {response.region}{response.district && ` · ${response.district}`}
+                                </div>
+                              )}
+                              <div className="break-words">
+                                {renderLocation(response.location)}
+                              </div>
+                              {responderCoords && (() => {
+                                const victimCoords = parseLocationCoords(response.location);
+                                if (victimCoords) {
+                                  const dist = calculateDistanceKm(responderCoords.lat, responderCoords.lng, victimCoords.lat, victimCoords.lng);
+                                  return (
+                                    <div className="inline-block mt-1 px-2 py-0.5 bg-ocean-900/60 text-ocean-300 border border-ocean-700/50 rounded-lg font-semibold text-[11px]">
+                                      🧭 {dist} km away
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </div>
+                            {response.images && response.images.length > 0 && (
+                              <div className="mt-2">
+                                <ImageGallery images={response.images} compact />
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <RelativeTime timestamp={response.submittedAt} />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex gap-2">
+                              {response.status !== 'in_progress' && response.status !== 'resolved' && (
+                                <button
+                                  onClick={() => updateResponseStatus(response.id, 'in_progress')}
+                                  className="text-xs px-2.5 py-1.5 bg-ocean-700/80 hover:bg-ocean-600 text-white rounded-lg transition-all font-medium"
+                                >
+                                  Start
+                                </button>
+                              )}
+                              {response.status !== 'resolved' && (
+                                <button
+                                  onClick={() => updateResponseStatus(response.id, 'resolved')}
+                                  className="text-xs px-2.5 py-1.5 bg-emerald-800/80 hover:bg-emerald-700 text-white rounded-lg transition-all font-medium"
+                                >
+                                  Resolve
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Modals ────────────────────────────────────────────────────── */}
+        {showSheetsSetup && id && (
+          <GoogleSheetsSetup incidentId={id} onClose={() => setShowSheetsSetup(false)} />
+        )}
+
+        {showQRScanner && id && (
+          <QRScannerModal
+            incidentId={id}
+            onScanSuccess={async (scannedData) => {
+              await storageService.submitResponse({
+                incidentId: id,
+                name: scannedData.name || 'Anonymous',
+                contact: scannedData.contact || 'N/A',
+                needs: scannedData.needs || 'No details provided',
+                location: scannedData.location || 'Unknown',
+                region: scannedData.region,
+                district: scannedData.district,
+                images: scannedData.images || [],
+              });
+              await loadData();
+            }}
+            onClose={() => setShowQRScanner(false)}
+          />
+        )}
+
+        {showPeerSync && (
+          <PeerBroadcastModal
+            isOpen={showPeerSync}
+            onClose={() => setShowPeerSync(false)}
+            incidents={incident ? [incident] : []}
+            onImportIncidents={async (importedIncidents) => {
+              for (const inc of importedIncidents) {
+                await storageService.createIncident(inc);
+              }
+              await loadData();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

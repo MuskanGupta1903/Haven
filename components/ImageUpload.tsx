@@ -125,9 +125,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">
-        Photos (Optional)
-        <span className="text-gray-500 font-normal ml-2">
+      <label className="block text-sm font-medium text-slate-200">
+        Photos <span className="text-ocean-400">(Optional)</span>
+        <span className="text-slate-400 font-normal ml-2">
           Max {maxImages} images
         </span>
       </label>
@@ -140,11 +140,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           onDrop={handleDrop}
           onClick={handleClickUpload}
           className={`
-            border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
+            border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer
             transition-all duration-200
             ${isDragging
-              ? 'border-primary-500 bg-primary-50'
-              : 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
+              ? 'border-ocean-500 bg-ocean-900/30 scale-[1.01]'
+              : 'border-ocean-700/60 hover:border-ocean-400 hover:bg-ocean-900/20'
             }
             ${isProcessing ? 'opacity-50 pointer-events-none' : ''}
           `}
@@ -161,16 +161,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
           {isProcessing ? (
             <div className="flex flex-col items-center">
-              <div className="animate-spin h-8 w-8 border-3 border-primary-600 border-t-transparent rounded-full mb-2"></div>
-              <p className="text-sm text-gray-600">Processing images...</p>
+              <div className="animate-spin h-8 w-8 border-2 border-ocean-500 border-t-transparent rounded-full mb-2"></div>
+              <p className="text-sm text-slate-400">Processing images...</p>
             </div>
           ) : (
             <>
-              <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600 mb-1">
-                <span className="font-medium text-primary-600">Click to upload</span> or drag and drop
+              <Upload className="mx-auto h-8 w-8 text-ocean-400 mb-2" />
+              <p className="text-sm text-slate-300 mb-1">
+                <span className="font-semibold text-ocean-400">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-500">
                 JPG, PNG or WebP (max 10MB per file)
               </p>
             </>
@@ -180,9 +180,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
       {/* Error Message */}
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg">
-          <AlertCircle className="w-4 h-4 text-danger-600 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-danger-800">{error}</p>
+        <div className="flex items-start gap-2 p-3 bg-coral-900/30 border border-coral-600/40 rounded-xl">
+          <AlertCircle className="w-4 h-4 text-coral-400 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-coral-300">{error}</p>
         </div>
       )}
 
@@ -194,19 +194,19 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               <img
                 src={image}
                 alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                className="w-full h-full object-cover rounded-2xl border border-white/10"
               />
               <button
                 type="button"
                 onClick={() => handleRemoveImage(index)}
-                className="absolute -top-2 -right-2 bg-danger-500 text-white rounded-full p-1
+                className="absolute -top-2 -right-2 bg-coral-600 hover:bg-coral-500 text-white rounded-full p-1
                          opacity-0 group-hover:opacity-100 transition-opacity shadow-lg
-                         hover:bg-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-500"
+                         focus:outline-none focus:ring-2 focus:ring-coral-500"
                 aria-label={`Remove image ${index + 1}`}
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+              <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-lg">
                 {index + 1}/{maxImages}
               </div>
             </div>
@@ -216,7 +216,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
       {/* Info Text */}
       {images.length === 0 && (
-        <p className="text-xs text-gray-500 flex items-center gap-1">
+        <p className="text-xs text-slate-500 flex items-center gap-1">
           <ImageIcon className="w-3 h-3" />
           Images help rescue teams assess the situation faster
         </p>

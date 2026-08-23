@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Incident } from '../types';
 import { P2PSyncManager } from '../utils/p2pSync';
+import { Radio, Shield, Wifi } from 'lucide-react';
 
 interface PeerBroadcastModalProps {
   isOpen: boolean;
@@ -22,11 +23,14 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
   const [answerTokenOutput, setAnswerTokenOutput] = useState<string>('');
   const [status, setStatus] = useState<string>('Ready to initialize P2P mesh connection');
   const [copied, setCopied] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       const mgr = new P2PSyncManager();
       mgr.onConnectionStateChange((state) => {
+        const connected = state === 'connected';
+        setIsConnected(connected);
         setStatus(`P2P State: ${state}`);
       });
       mgr.onIncidentsReceived((received) => {
@@ -41,6 +45,7 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
       setAnswerTokenInput('');
       setAnswerTokenOutput('');
       setStatus('Ready');
+      setIsConnected(false);
     }
   }, [isOpen]);
 
@@ -96,41 +101,46 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const inputClass =
+    'w-full bg-slate-800 border border-ocean-800 text-xs rounded-xl px-3 py-2 text-slate-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-ocean-500 focus:border-ocean-600';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-lg w-full p-6 text-white relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold"
-        >
-          ✕
-        </button>
-
-        <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-amber-400">
-          📡 WebRTC Offline Peer Broadcast (无网近场同步)
-        </h3>
-        <p className="text-xs text-slate-300 mb-4">
-          通过 P2P 数据通道进行设备对设备离线同步，无需外网服务器。
-        </p>
-
-        <div className="flex gap-2 mb-4 bg-slate-800 p-1 rounded-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-slate-950/95 backdrop-blur-xl border border-ocean-800/60 rounded-2xl shadow-2xl max-w-lg w-full p-6 text-white relative">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-ocean-500/20 rounded-xl border border-ocean-500/30">
+              <Radio className="w-5 h-5 text-ocean-400" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white">P2P Mesh Broadcast</h3>
+              <p className="text-xs text-slate-500">WebRTC · Offline · Device-to-Device</p>
+            </div>
+          </div>
           <button
-            onClick={() => setRole('host')}
-            className={`flex-1 py-1.5 text-sm rounded-md font-medium transition ${
-              role === 'host' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
-            }`}
+            onClick={onClose}
+            className="text-slate-500 hover:text-white hover:bg-white/10 rounded-full p-1.5 transition-all text-lg font-bold"
           >
-            主机/广播 (Host)
+            ✕
           </button>
+        </div>
 
-          <button
-            onClick={() => setRole('join')}
-            className={`flex-1 py-1.5 text-sm rounded-md font-medium transition ${
-              role === 'join' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            加入/接收 (Join)
-          </button>
+        {/* Role Toggle */}
+        <div className="flex gap-1 mb-5 bg-slate-900 p-1 rounded-xl border border-white/5">
+          {(['host', 'join'] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`flex-1 py-2 text-sm rounded-lg font-semibold transition-all ${
+                role === r
+                  ? 'bg-ocean-600 text-white shadow-lg shadow-ocean-900/50'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              {r === 'host' ? '📡 Host / Broadcast' : '📥 Join / Receive'}
+            </button>
+          ))}
         </div>
 
         {role === 'host' ? (
@@ -138,24 +148,22 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
             {!offerToken ? (
               <button
                 onClick={handleGenerateOffer}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-lg"
+                className="w-full bg-ocean-600 hover:bg-ocean-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-ocean-900/40"
               >
-                生成广播口令 (Generate Token)
+                Generate Connection Token
               </button>
             ) : (
               <div>
-                <label className="block text-xs text-slate-400 mb-1">1. 将此口令复制给对方：</label>
+                <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wider">
+                  1. Share this token with your nearby rescue peer:
+                </label>
                 <div className="flex gap-2">
-                  <input
-                    readOnly
-                    value={offerToken}
-                    className="w-full bg-slate-800 border border-slate-700 text-xs rounded px-2 py-1 text-slate-300"
-                  />
+                  <input readOnly value={offerToken} className={inputClass} />
                   <button
                     onClick={() => copyToClipboard(offerToken)}
-                    className="bg-slate-700 hover:bg-slate-600 px-3 py-1 text-xs rounded font-medium"
+                    className="bg-ocean-700 hover:bg-ocean-600 border border-ocean-600 px-3 py-1.5 text-xs rounded-xl font-semibold text-ocean-200 whitespace-nowrap transition-all"
                   >
-                    {copied ? '已复制' : '复制'}
+                    {copied ? '✓ Copied' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -163,19 +171,21 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
 
             {offerToken && (
               <div>
-                <label className="block text-xs text-slate-400 mb-1">2. 粘贴对方的应答口令 (Answer Token)：</label>
+                <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wider">
+                  2. Paste peer's Answer Token:
+                </label>
                 <textarea
                   rows={2}
                   value={answerTokenInput}
                   onChange={(e) => setAnswerTokenInput(e.target.value)}
-                  placeholder="在此粘贴对方生成的 Answer Token..."
-                  className="w-full bg-slate-800 border border-slate-700 text-xs rounded p-2 text-white"
+                  placeholder="Paste the Answer Token here..."
+                  className={`${inputClass} resize-none`}
                 />
                 <button
                   onClick={handleConnectAnswer}
-                  className="w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg"
+                  className="w-full mt-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl transition-all"
                 >
-                  建立 P2P 链路 (Connect)
+                  Establish P2P Link
                 </button>
               </div>
             )}
@@ -183,36 +193,36 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
         ) : (
           <div className="space-y-4 text-sm">
             <div>
-              <label className="block text-xs text-slate-400 mb-1">1. 粘贴主机的广播口令 (Host Token)：</label>
+              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wider">
+                1. Paste Host's Broadcast Token:
+              </label>
               <textarea
                 rows={2}
                 value={answerTokenInput}
                 onChange={(e) => setAnswerTokenInput(e.target.value)}
-                placeholder="在此粘贴 Host 产生的 Token..."
-                className="w-full bg-slate-800 border border-slate-700 text-xs rounded p-2 text-white"
+                placeholder="Paste Host token here..."
+                className={`${inputClass} resize-none`}
               />
               <button
                 onClick={handleJoinOffer}
-                className="w-full mt-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 rounded-lg"
+                className="w-full mt-2 bg-ocean-600 hover:bg-ocean-500 text-white font-bold py-2 rounded-xl transition-all"
               >
-                生成应答口令 (Generate Answer)
+                Generate Answer Token
               </button>
             </div>
 
             {answerTokenOutput && (
               <div>
-                <label className="block text-xs text-slate-400 mb-1">2. 将此应答口令发回给主机：</label>
+                <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wider">
+                  2. Send this Answer Token back to host:
+                </label>
                 <div className="flex gap-2">
-                  <input
-                    readOnly
-                    value={answerTokenOutput}
-                    className="w-full bg-slate-800 border border-slate-700 text-xs rounded px-2 py-1 text-slate-300"
-                  />
+                  <input readOnly value={answerTokenOutput} className={inputClass} />
                   <button
                     onClick={() => copyToClipboard(answerTokenOutput)}
-                    className="bg-slate-700 hover:bg-slate-600 px-3 py-1 text-xs rounded font-medium"
+                    className="bg-ocean-700 hover:bg-ocean-600 border border-ocean-600 px-3 py-1.5 text-xs rounded-xl font-semibold text-ocean-200 whitespace-nowrap transition-all"
                   >
-                    {copied ? '已复制' : '复制'}
+                    {copied ? '✓ Copied' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -220,13 +230,21 @@ export const PeerBroadcastModal: React.FC<PeerBroadcastModalProps> = ({
           </div>
         )}
 
-        <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
-          <div className="text-xs text-amber-400 font-mono">{status}</div>
+        {/* Status Bar */}
+        <div className="mt-5 pt-4 border-t border-ocean-900/60 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
+              }`}
+            />
+            <span className="text-xs text-ocean-300 font-mono truncate">{status}</span>
+          </div>
           <button
             onClick={handleSendIncidents}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-1.5 text-xs rounded-lg"
+            className="bg-emerald-700 hover:bg-emerald-600 text-white font-bold px-4 py-1.5 text-xs rounded-xl whitespace-nowrap transition-all flex-shrink-0"
           >
-            广播本地事件 ({incidents.length})
+            Broadcast ({incidents.length})
           </button>
         </div>
       </div>

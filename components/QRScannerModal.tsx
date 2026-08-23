@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Camera, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Camera, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { IncidentResponse } from '../types';
 
 interface QRScannerModalProps {
@@ -103,60 +103,69 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({ incidentId, onSc
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 animate-in fade-in duration-200">
+      <div className="bg-slate-900/95 backdrop-blur-xl border border-ocean-700/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative text-white">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-all"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2 mb-4">
-          <Camera className="w-6 h-6 text-primary-600" />
-          <h3 className="text-xl font-bold text-gray-900">Scan Victim SOS QR Code</h3>
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="p-2 bg-ocean-500/20 rounded-xl border border-ocean-500/30">
+            <Camera className="w-5 h-5 text-ocean-400" />
+          </div>
+          <h3 className="text-xl font-bold text-white">Scan Victim SOS QR Code</h3>
         </div>
 
         {/* Video Preview */}
-        <div className="relative bg-black rounded-xl overflow-hidden aspect-video flex items-center justify-center mb-4 border border-gray-800">
+        <div className="relative bg-black rounded-2xl overflow-hidden aspect-video flex items-center justify-center mb-4 border border-white/10">
           <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
           {!isScanning && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm p-4 text-center">
+            <div className="absolute inset-0 flex items-center justify-center text-slate-500 text-sm p-4 text-center">
               Camera inactive. Use manual input below.
             </div>
           )}
           {isScanning && (
-            <div className="absolute inset-0 border-2 border-red-500/60 rounded-xl pointer-events-none animate-pulse" />
+            <>
+              {/* Corner frame decoration */}
+              <div className="absolute inset-0 border-2 border-ocean-500/70 rounded-2xl pointer-events-none animate-pulse" />
+              <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-ocean-400 rounded-tl" />
+              <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-ocean-400 rounded-tr" />
+              <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-ocean-400 rounded-bl" />
+              <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-ocean-400 rounded-br" />
+            </>
           )}
         </div>
 
         {successMsg && (
-          <div className="mb-4 p-3 bg-green-50 text-green-700 border border-green-200 rounded-lg flex items-center gap-2 text-sm font-medium">
-            <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+          <div className="mb-4 p-3 bg-emerald-900/40 text-emerald-300 border border-emerald-600/40 rounded-xl flex items-center gap-2 text-sm font-medium">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
             {successMsg}
           </div>
         )}
 
         {error && (
-          <div className="mb-4 p-3 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg flex items-center gap-2 text-xs">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+          <div className="mb-4 p-3 bg-amber-900/30 text-amber-300 border border-amber-500/40 rounded-xl flex items-center gap-2 text-xs">
+            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
             {error}
           </div>
         )}
 
         {/* Manual Paste Payload Area */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700">Paste Payload Text Manually</label>
+          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Paste Payload Manually</label>
           <div className="flex gap-2">
             <textarea
               rows={2}
               value={manualText}
               onChange={(e) => setManualText(e.target.value)}
               placeholder="Paste JSON or SOS payload string..."
-              className="flex-1 p-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono"
+              className="flex-1 p-2 text-xs bg-slate-800 border border-ocean-700/60 text-slate-200 placeholder-slate-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent font-mono resize-none"
             />
             <button
               onClick={handleManualImport}
-              className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-lg shadow"
+              className="px-4 py-2 bg-ocean-600 hover:bg-ocean-500 text-white text-xs font-semibold rounded-xl shadow transition-all"
             >
               Import
             </button>
